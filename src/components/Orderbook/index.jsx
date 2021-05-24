@@ -14,7 +14,7 @@ function Orderbook() {
     labels: [],
     datasets: [
       {
-        label: "Price / Size",
+        label: "Asks",
         data: [],
         backgroundColor: ["rgba(255, 99, 132, 0.2)"],
         borderColor: ["rgba(255, 99, 132, 1)"],
@@ -26,7 +26,7 @@ function Orderbook() {
     labels: [],
     datasets: [
       {
-        label: "Price / Size",
+        label: "Bids",
         data: [],
         backgroundColor: ["rgba(54, 162, 235, 0.2)"],
         borderColor: ["rgba(54, 162, 235, 1)"],
@@ -37,8 +37,6 @@ function Orderbook() {
 
   const options = {
     indexAxis: "y",
-    // Elements options apply to all of the options unless overridden in a dataset
-    // In this case, we are setting the border of each horizontal bar to be 2px wide
     elements: {
       bar: {
         borderWidth: 2,
@@ -47,11 +45,11 @@ function Orderbook() {
     responsive: true,
     plugins: {
       legend: {
-        position: "right",
+        position: "top",
       },
       title: {
         display: true,
-        text: "Orderbook",
+        text: "Price x Size",
       },
     },
   };
@@ -110,7 +108,7 @@ function Orderbook() {
     result.datasets[0].data = [];
 
     data.map((item) => {
-      result.labels.push(`${item[0]}`);
+      result.labels.push(formatPrice.format(item[0]));
       result.datasets[0].data.push(item[1]);
     });
 
@@ -141,6 +139,11 @@ function Orderbook() {
     }
   };
 
+  const formatPrice = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+
   const displayData = (data, chartData) => (
     <Row>
       <Col xs={24} sm={24} md={12}>
@@ -153,32 +156,36 @@ function Orderbook() {
                   bordered
                   dataSource={data}
                   renderItem={(item) => (
-                    <List.Item style={{ border: "none" }}>{item[0]}</List.Item>
+                    <List.Item style={{ fontSize: "10px" }}>
+                      {formatPrice.format(item[0])}
+                    </List.Item>
                   )}
                 />
               </Descriptions.Item>
             </Col>
-            <Col xs={7} sm={7} md={8}>
+            <Col xs={6} sm={6} md={8}>
               <Descriptions.Item label="Size">
                 <List
                   size="small"
                   bordered
                   dataSource={data}
                   renderItem={(item) => (
-                    <List.Item style={{ border: "none" }}>{item[1]}</List.Item>
+                    <List.Item style={{ fontSize: "10px" }}>
+                      {item[1]}
+                    </List.Item>
                   )}
                 />
               </Descriptions.Item>
             </Col>
-            <Col xs={10} sm={10} md={8}>
+            <Col xs={11} sm={11} md={8}>
               <Descriptions.Item label="Total">
                 <List
                   size="small"
                   bordered
                   dataSource={data}
                   renderItem={(item) => (
-                    <List.Item style={{ border: "none" }}>
-                      {item[0] * item[1]}
+                    <List.Item style={{ fontSize: "10px" }}>
+                      {formatPrice.format(item[0] * item[1])}
                     </List.Item>
                   )}
                 />
@@ -187,7 +194,12 @@ function Orderbook() {
           </Row>
         </Descriptions>
       </Col>
-      <Col xs={24} sm={24} md={8} offset={1}>
+      <Col
+        md={{ span: 8, offset: 1 }}
+        lg={{ span: 8, offset: 1 }}
+        sm={{ span: 24, offset: 0 }}
+        xs={{ span: 24, offset: 0 }}
+      >
         <Bar data={chartData} options={options} />
       </Col>
     </Row>
@@ -198,6 +210,21 @@ function Orderbook() {
       <Row>
         <Col xs={24} sm={24} md={24}>
           Connection: <Tag color="green">{connectionStatus}</Tag>
+          <Row>
+            <Col xs={24} sm={24} md={12}>
+              <Row>
+                <Col xs={7} sm={7} md={8}>
+                  Price
+                </Col>
+                <Col xs={7} sm={7} md={8}>
+                  Size
+                </Col>
+                <Col xs={10} sm={10} md={8}>
+                  Total
+                </Col>
+              </Row>
+            </Col>
+          </Row>
           {displayData(asks, asksChart)}
           <Divider />
           {displayData(bids, bidsChart)}
