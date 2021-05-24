@@ -10,7 +10,7 @@ function App({ Component, pageProps }) {
       appId="aaGehqw04JrNSeafGwYM5rLIBdBTehO6qpYjRt0M"
       serverUrl="https://qvmjfsikgivk.moralis.io:2053/server"
     >
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </MoralisProvider>
   );
 }
